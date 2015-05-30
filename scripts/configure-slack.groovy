@@ -1,3 +1,9 @@
+/*
+   Author: Glen Mailer (https://github.com/glenjamin)
+   Original Script:
+     https://github.com/jenkinsci/slack-plugin/issues/23
+ */
+
 def slack = Jenkins.instance.getExtensionList(
   jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class
 )[0]
