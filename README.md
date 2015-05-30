@@ -30,12 +30,13 @@ Now control the Jenkins service.
     provision_jenkins.sh restart
 
 
-Interact with it via Jenkins CLI.
+See other options.
 
-    provision_jenkins.sh cli help
-    provision_jenkins.sh cli help 2>&1 | less
+    provision_jenkins.sh --help
 
-Completely clean your `${JENKINS_HOME}` but don't delete `jenkins.war` or
+### Delete Jenkins
+
+Clean your `${JENKINS_HOME}` but don't delete `jenkins.war` or
 `jenkins-cli.jar`.
 
     provision_jenkins.sh clean
