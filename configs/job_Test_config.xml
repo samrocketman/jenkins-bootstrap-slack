@@ -62,7 +62,7 @@ fi</command>
   <publishers>
     <jenkins.plugins.slack.SlackNotifier plugin="slack@1.8">
       <teamDomain>jenkins-slack-plugin</teamDomain>
-      <authToken>xaMSYVZ0GgGbAzIOhqN2fviO</authToken>
+      <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
       <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
       <sendAs></sendAs>
