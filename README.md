@@ -1,6 +1,6 @@
 # Bootstrap Jenkins to test Slack Plugin
 
-The Jenkins [Slack plugin][slack-plugin] generates Jenkins jobs using Travis CI YAML.
+The [Jenkins][jenkins] [Slack plugin][slack-plugin] publishes build information to [Slack][slack] teams.
 
 # Instructions
 
