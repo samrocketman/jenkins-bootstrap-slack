@@ -1,5 +1,5 @@
 /*
-   Author: Sam Gleske (https://github.com/samrocketman
+   Author: Sam Gleske (https://github.com/samrocketman)
    Configures the markup formatter in global security settings.
  */
 
