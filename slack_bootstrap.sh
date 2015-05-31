@@ -21,6 +21,7 @@ export JENKINS_HOME="my_jenkins_home"
 #create the jobs that are well configured for testing the slack plugin.
 ./scripts/provision_jenkins.sh cli create-job Test < ./configs/job_Test_config.xml
 ./scripts/provision_jenkins.sh cli create-job jervis < ./configs/job_jervis_config.xml
+./scripts/provision_jenkins.sh cli create-job slack-plugin < ./configs/job_slack-plugin_config.xml
 #configure global settings
 curl -d "script=$(<./scripts/configure-markup-formatter.groovy)" http://localhost:8080/scriptText
 curl -d "script=$(<./scripts/configure-slack.groovy)" http://localhost:8080/scriptText
