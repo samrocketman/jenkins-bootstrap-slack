@@ -1,6 +1,7 @@
 # Bootstrap Jenkins to test Slack Plugin
 
-The [Jenkins][jenkins] [Slack plugin][slack-plugin] publishes build information to [Slack][slack] teams.
+The [Jenkins][jenkins] [Slack plugin][slack-plugin] publishes build information
+to [Slack][slack] teams.
 
 # Instructions
 
