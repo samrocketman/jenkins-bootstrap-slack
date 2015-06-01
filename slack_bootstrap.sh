@@ -15,7 +15,7 @@ export JENKINS_HOME="my_jenkins_home"
 #install required plugins
 #cobertura is for code coverage reporting
 #covcomplplot is for surfacing code complexity graphs
-./scripts/provision_jenkins.sh install-plugins slack cobertura covcomplplot
+./scripts/provision_jenkins.sh install-plugins slack cobertura covcomplplot htmlpublisher
 #restart jenkins
 ./scripts/provision_jenkins.sh restart
 #create the jobs that are well configured for testing the slack plugin.
@@ -23,6 +23,7 @@ export JENKINS_HOME="my_jenkins_home"
 ./scripts/provision_jenkins.sh cli create-job jervis < ./configs/job_jervis_config.xml
 ./scripts/provision_jenkins.sh cli create-job slack-plugin < ./configs/job_slack-plugin_config.xml
 #configure global settings
+sleep 5
 curl -d "script=$(<./scripts/configure-markup-formatter.groovy)" http://localhost:8080/scriptText
 curl -d "script=$(<./scripts/configure-slack.groovy)" http://localhost:8080/scriptText
 echo 'Jenkins is ready.  Visit http://localhost:8080/'
