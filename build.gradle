@@ -7,10 +7,28 @@ defaultTasks 'getjenkins', 'getplugins'
 //perhaps use JENKINS_HOME some day
 //avoiding JENKINS_HOME because I only want to copy if file doesn't exist
 //by default the copy function will overwrite plugins in JENKINS_HOME if the hash is different
-//ext.jenkinsHome = System.getenv('JENKINS_HOME')?:'.'
+ext.jenkinsHome = System.getenv('JENKINS_HOME')?:'my_jenkins_home'
 ext.bootstrapHome = System.getenv('BOOTSTRAP_HOME')?:'.'
 ext.pluginsDest = bootstrapHome
 ext.jenkinsDest = bootstrapHome
+
+task clean(type: Delete, overwrite:true) {
+    doFirst {
+        //stop jenkins just in case it's running
+        def stdout = new StringBuilder()
+        def stderr = new StringBuilder()
+        def process = ["${bootstrapHome}/scripts/provision_jenkins.sh", 'stop'].execute()
+        process.waitForProcessOutput(stdout, stderr)
+        println stdout.toString()
+        println stderr.toString()
+    }
+    delete 'console.log'
+    delete 'jenkins-cli.jar'
+    delete 'jenkins.pid'
+    delete 'jenkins.war'
+    delete 'plugins'
+    delete jenkinsHome
+}
 
 configurations {
     getplugins {
