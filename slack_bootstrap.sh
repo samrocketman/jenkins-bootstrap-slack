@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #Created by Sam Gleske (https://github.com/samrocketman)
 #Sat May 30 18:16:48 EDT 2015
 #Ubuntu 14.04.2 LTS
@@ -8,22 +8,66 @@
 
 #A script which bootstraps a Jenkins installation for executing Jervis Job DSL scripts
 
-export JENKINS_HOME="my_jenkins_home"
+#sane defaults
+export CURL="${CURL:-curl}"
+export JENKINS_HOME="${JENKINS_HOME:-my_jenkins_home}"
+export jenkins_url="${jenkins_url:-http://mirrors.jenkins-ci.org/war/latest/jenkins.war}"
+export JENKINS_WAR="${JENKINS_WAR:-jenkins.war}"
+export JENKINS_WEB="${JENKINS_WEB:-http://localhost:8080}"
+export BOOTSTRAP_HOME="${BOOTSTRAP_HOME:-.}"
+export SCRIPT_LIBRARY_PATH="${SCRIPT_LIBRARY_PATH:-${BOOTSTRAP_HOME}/scripts}"
+
+if [ -e "${SCRIPT_LIBRARY_PATH}/common.sh" ]; then
+  source "${SCRIPT_LIBRARY_PATH}/common.sh"
+else
+  echo "ERROR could not find ${SCRIPT_LIBRARY_PATH}/common.sh"
+  echo "Perhaps environment variable SCRIPT_LIBRARY_PATH is not set correctly."
+  exit 1
+fi
+
+#provision jenkins and plugins
+echo 'Downloading specific versions of Jenkins and plugins...'
+gradle getjenkins getplugins
+
+if [ -d "${BOOTSTRAP_HOME}/plugins" ]; then
+  mkdir -p "${JENKINS_HOME}/plugins"
+  ( cd "${BOOTSTRAP_HOME}/plugins/"; ls -1d * ) | while read x; do
+    if [ ! -e "${JENKINS_HOME}/plugins/${x}" ]; then
+      echo "Copying ${x} to JENKINS_HOME"
+      cp -r "${BOOTSTRAP_HOME}/plugins/${x}" "${JENKINS_HOME}/plugins/"
+      #pin plugin versions
+      #https://wiki.jenkins-ci.org/display/JENKINS/Pinned+Plugins
+      touch "${JENKINS_HOME}/plugins/${x}.pinned"
+    fi
+  done
+fi
 
 #download jenkins, start it up, and update the plugins
-./scripts/provision_jenkins.sh bootstrap --skip-restart | grep -v 'Jenkins is ready'
-#install required plugins
-#cobertura is for code coverage reporting
-#covcomplplot is for surfacing code complexity graphs
-./scripts/provision_jenkins.sh install-plugins slack cobertura covcomplplot htmlpublisher
-#restart jenkins
-./scripts/provision_jenkins.sh restart
-#create the jobs that are well configured for testing the slack plugin.
-./scripts/provision_jenkins.sh cli create-job Test < ./configs/job_Test_config.xml
-./scripts/provision_jenkins.sh cli create-job jervis < ./configs/job_jervis_config.xml
-./scripts/provision_jenkins.sh cli create-job slack-plugin < ./configs/job_slack-plugin_config.xml
-#configure global settings
-sleep 5
-curl -d "script=$(<./scripts/configure-markup-formatter.groovy)" http://localhost:8080/scriptText
-curl -d "script=$(<./scripts/configure-slack.groovy)" http://localhost:8080/scriptText
+if [ ! -e "${JENKINS_WAR}" ]; then
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" download-file "${jenkins_url}" "${JENKINS_WAR}"
+fi
+#check for running jenkins or try to start it
+if ! "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" status; then
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" start
+fi
+#wait for jenkins to become available
+"${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" url-ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
+#update and install plugins
+if [ "$1" = "update" ]; then
+  echo "Bootstrap Jenkins via script console (may take a while without output)"
+  echo "NOTE: you could open a new terminal and tail -f console.log"
+  jenkins_console --script "${SCRIPT_LIBRARY_PATH}/bootstrap.groovy"
+fi
+#conditional restart jenkins
+if $(CURL="${CURL} -s" jenkins_console --script "${SCRIPT_LIBRARY_PATH}/console-needs-restart.groovy"); then
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" restart
+  #wait for jenkins to become available
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" url-ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
+fi
+#create jobs for testing
+create_job --job-name "Test" --xml-data "${BOOTSTRAP_HOME}/configs/job_Test_config.xml"
+create_job --job-name "jervis" --xml-data "${BOOTSTRAP_HOME}/configs/job_jervis_config.xml"
+create_job --job-name "slack-plugin" --xml-data "${BOOTSTRAP_HOME}/configs/job_slack-plugin_config.xml"
+jenkins_console --script "${SCRIPT_LIBRARY_PATH}/configure-markup-formatter.groovy"
+jenkins_console --script "${SCRIPT_LIBRARY_PATH}/configure-slack.groovy"
 echo 'Jenkins is ready.  Visit http://localhost:8080/'
