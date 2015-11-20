@@ -74,7 +74,7 @@ dependencies {
     getplugins 'org.jenkins-ci.plugins:plain-credentials:1.1@hpi'
     getplugins 'org.jenkins-ci.plugins:scm-api:1.0@hpi'
     getplugins 'org.jenkins-ci.plugins:script-security:1.15@hpi'
-    getplugins 'org.jenkins-ci.plugins:slack:1.8@hpi'
+    getplugins 'org.jenkins-ci.plugins:slack:1.8.1@hpi'
     getplugins 'org.jenkins-ci.plugins:ssh-credentials:1.11@hpi'
     getplugins 'org.jenkins-ci.plugins:ssh-slaves:1.10@hpi'
     getplugins 'org.jenkins-ci.plugins:subversion:2.5.4@hpi'
