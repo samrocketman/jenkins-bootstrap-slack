@@ -1,9 +1,9 @@
 language: java
 install: true
 script:
-  - ./slack_bootstrap.sh
-  - curl http://localhost:8080/api/json?pretty=true | python ./tests/api_test.py
-  - ./scripts/provision_jenkins.sh stop
+  - test -x ./tests/test.sh
+  - bash -n ./tests/test.sh
+  - timeout 1200 ./tests/test.sh
 branches:
   only:
     - master
