@@ -53,7 +53,7 @@ JENKINS_WEB="${JENKINS_WEB%/}"
 #Get JAVA_HOME for java 1.7 on Mac OS X
 #will only run if OS X is detected
 if uname -rms | grep Darwin &> /dev/null; then
-  JAVA_HOME="$(/usr/libexec/java_home -v 1.7)"
+  JAVA_HOME="$(/usr/libexec/java_home)"
   PATH="${JAVA_HOME}/bin:${PATH}"
   echo "JAVA_HOME=${JAVA_HOME}"
   java -version
