@@ -18,23 +18,6 @@
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    <jenkins.plugins.slack.SlackNotifier_-SlackJobProperty plugin="slack@1.8">
-      <teamDomain></teamDomain>
-      <token></token>
-      <room></room>
-      <startNotification>false</startNotification>
-      <notifySuccess>true</notifySuccess>
-      <notifyAborted>false</notifyAborted>
-      <notifyNotBuilt>false</notifyNotBuilt>
-      <notifyUnstable>true</notifyUnstable>
-      <notifyFailure>true</notifyFailure>
-      <notifyBackToNormal>false</notifyBackToNormal>
-      <notifyRepeatedFailure>false</notifyRepeatedFailure>
-      <includeTestSummary>false</includeTestSummary>
-      <showCommitList>false</showCommitList>
-      <includeCustomMessage>true</includeCustomMessage>
-      <customMessage>Testing project custom message for ${BUILD_NUMBER}</customMessage>
-    </jenkins.plugins.slack.SlackNotifier_-SlackJobProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
@@ -60,12 +43,24 @@ fi</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <jenkins.plugins.slack.SlackNotifier plugin="slack@1.8">
+    <jenkins.plugins.slack.SlackNotifier plugin="slack@2.0.1">
       <teamDomain>jenkins-slack-plugin</teamDomain>
       <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
       <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
       <sendAs></sendAs>
+      <startNotification>false</startNotification>
+      <notifySuccess>true</notifySuccess>
+      <notifyAborted>false</notifyAborted>
+      <notifyNotBuilt>false</notifyNotBuilt>
+      <notifyUnstable>true</notifyUnstable>
+      <notifyFailure>true</notifyFailure>
+      <notifyBackToNormal>false</notifyBackToNormal>
+      <notifyRepeatedFailure>false</notifyRepeatedFailure>
+      <includeTestSummary>false</includeTestSummary>
+      <commitInfoChoice>NONE</commitInfoChoice>
+      <includeCustomMessage>true</includeCustomMessage>
+      <customMessage>Testing project custom message for ${BUILD_NUMBER}</customMessage>
     </jenkins.plugins.slack.SlackNotifier>
   </publishers>
   <buildWrappers/>

@@ -5,28 +5,11 @@
   <displayName>Jervis</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.11.3">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.19.1">
       <projectUrl>https://github.com/samrocketman/jervis/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.plugins.slack.SlackNotifier_-SlackJobProperty plugin="slack@1.8">
-      <teamDomain>jenkins-slack-plugin</teamDomain>
-      <token>IjY6RSF3XpJVt6YD7LIGV794</token>
-      <room>#slack-plugin-testing</room>
-      <startNotification>true</startNotification>
-      <notifySuccess>true</notifySuccess>
-      <notifyAborted>true</notifyAborted>
-      <notifyNotBuilt>true</notifyNotBuilt>
-      <notifyUnstable>true</notifyUnstable>
-      <notifyFailure>true</notifyFailure>
-      <notifyBackToNormal>true</notifyBackToNormal>
-      <notifyRepeatedFailure>true</notifyRepeatedFailure>
-      <includeTestSummary>true</includeTestSummary>
-      <showCommitList>true</showCommitList>
-      <includeCustomMessage>true</includeCustomMessage>
-      <customMessage>Jervis project master branch</customMessage>
-    </jenkins.plugins.slack.SlackNotifier_-SlackJobProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.4.4">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -58,7 +41,7 @@
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.plugins.cobertura.CoberturaPublisher plugin="cobertura@1.9.7">
+    <hudson.plugins.cobertura.CoberturaPublisher plugin="cobertura@1.9.8">
       <coberturaReportFile>build/reports/cobertura/coverage.xml</coberturaReportFile>
       <onlyStable>false</onlyStable>
       <failUnhealthy>false</failUnhealthy>
@@ -118,7 +101,7 @@
       </failingTarget>
       <sourceEncoding>ASCII</sourceEncoding>
     </hudson.plugins.cobertura.CoberturaPublisher>
-    <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.4">
+    <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.11">
       <reportTargets>
         <htmlpublisher.HtmlPublisherTarget>
           <reportName>Gradle Test Summary</reportName>
@@ -127,14 +110,14 @@
           <alwaysLinkToLastBuild>true</alwaysLinkToLastBuild>
           <keepAll>true</keepAll>
           <allowMissing>true</allowMissing>
-          <wrapperName>htmlpublisher-wrapper.html</wrapperName>
         </htmlpublisher.HtmlPublisherTarget>
       </reportTargets>
     </htmlpublisher.HtmlPublisher>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.6">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.13">
       <testResults>build/test-results/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.tasks.JavadocArchiver plugin="javadoc@1.3">
       <javadocDir>build/docs/groovydoc</javadocDir>
@@ -146,12 +129,24 @@
       <excludeGetterSetter>false</excludeGetterSetter>
       <locateTopMost>true</locateTopMost>
     </hudson.plugins.covcomplplot.CovComplPlotPublisher>
-    <jenkins.plugins.slack.SlackNotifier plugin="slack@1.8">
+    <jenkins.plugins.slack.SlackNotifier plugin="slack@2.0.1">
       <teamDomain>jenkins-slack-plugin</teamDomain>
       <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
       <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
       <sendAs></sendAs>
+      <startNotification>true</startNotification>
+      <notifySuccess>true</notifySuccess>
+      <notifyAborted>true</notifyAborted>
+      <notifyNotBuilt>true</notifyNotBuilt>
+      <notifyUnstable>true</notifyUnstable>
+      <notifyFailure>true</notifyFailure>
+      <notifyBackToNormal>true</notifyBackToNormal>
+      <notifyRepeatedFailure>true</notifyRepeatedFailure>
+      <includeTestSummary>true</includeTestSummary>
+      <commitInfoChoice>AUTHORS_AND_TITLES</commitInfoChoice>
+      <includeCustomMessage>true</includeCustomMessage>
+      <customMessage>Jervis project master branch</customMessage>
     </jenkins.plugins.slack.SlackNotifier>
   </publishers>
   <buildWrappers/>

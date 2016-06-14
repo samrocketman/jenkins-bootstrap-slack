@@ -5,28 +5,11 @@
   <displayName>Slack Plugin</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.11.3">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.19.1">
       <projectUrl>https://github.com/jenkinsci/slack-plugin/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.plugins.slack.SlackNotifier_-SlackJobProperty plugin="slack@1.8">
-      <teamDomain></teamDomain>
-      <token></token>
-      <room></room>
-      <startNotification>true</startNotification>
-      <notifySuccess>true</notifySuccess>
-      <notifyAborted>true</notifyAborted>
-      <notifyNotBuilt>true</notifyNotBuilt>
-      <notifyUnstable>true</notifyUnstable>
-      <notifyFailure>true</notifyFailure>
-      <notifyBackToNormal>true</notifyBackToNormal>
-      <notifyRepeatedFailure>true</notifyRepeatedFailure>
-      <includeTestSummary>true</includeTestSummary>
-      <showCommitList>true</showCommitList>
-      <includeCustomMessage>true</includeCustomMessage>
-      <customMessage>My custom message again</customMessage>
-    </jenkins.plugins.slack.SlackNotifier_-SlackJobProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.4.4">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -63,18 +46,32 @@
       <onlyIfSuccessful>false</onlyIfSuccessful>
       <fingerprint>false</fingerprint>
       <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
     </hudson.tasks.ArtifactArchiver>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.6">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.13">
       <testResults>**/target/surefire-reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <jenkins.plugins.slack.SlackNotifier plugin="slack@1.8">
+    <jenkins.plugins.slack.SlackNotifier plugin="slack@2.0.1">
       <teamDomain>jenkins-slack-plugin</teamDomain>
       <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
       <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
       <sendAs></sendAs>
+      <startNotification>true</startNotification>
+      <notifySuccess>true</notifySuccess>
+      <notifyAborted>true</notifyAborted>
+      <notifyNotBuilt>true</notifyNotBuilt>
+      <notifyUnstable>true</notifyUnstable>
+      <notifyFailure>true</notifyFailure>
+      <notifyBackToNormal>true</notifyBackToNormal>
+      <notifyRepeatedFailure>true</notifyRepeatedFailure>
+      <includeTestSummary>true</includeTestSummary>
+      <commitInfoChoice>AUTHORS_AND_TITLES</commitInfoChoice>
+      <includeCustomMessage>true</includeCustomMessage>
+      <customMessage>My custom message again</customMessage>
     </jenkins.plugins.slack.SlackNotifier>
   </publishers>
   <buildWrappers/>
