@@ -21,7 +21,7 @@
 #  Automatically provision and start Jenkins on your laptop.
 #    mkdir ~/jenkins_testing
 #    cd ~/jenkins_testing
-#    provision_jenkins.sh
+#    provision_jenkins.sh bootstrap
 #  Kill and completely delete your provisioned Jenkins.
 #    cd ~/jenkins_testing
 #    provision_jenkins.sh purge
@@ -43,14 +43,15 @@
 jenkins_url="${jenkins_url:-http://mirrors.jenkins-ci.org/war/latest/jenkins.war}"
 #LTS Jenkins URL
 #jenkins_url="${jenkins_url:-http://mirrors.jenkins-ci.org/war-stable/latest/jenkins.war}"
-JENKINS_HOME="${JENKINS_HOME:-my_jenkins_home}"
+JENKINS_HOME="${JENKINS_HOME:-../my_jenkins_home}"
 JENKINS_WEB="${JENKINS_WEB:-http://localhost:8080/}"
 JENKINS_CLI="${JENKINS_CLI:-java -jar ./jenkins-cli.jar -s ${JENKINS_WEB} -noKeyAuth}"
 JENKINS_START="${JENKINS_START:-java -jar jenkins.war}"
 #remove trailing slash
 JENKINS_WEB="${JENKINS_WEB%/}"
+CURL="${CURL:-curl}"
 
-#Get JAVA_HOME for java 1.7 on Mac OS X
+#Get JAVA_HOME for java on Mac OS X
 #will only run if OS X is detected
 if uname -rms | grep Darwin &> /dev/null; then
   JAVA_HOME="$(/usr/libexec/java_home)"
@@ -59,11 +60,157 @@ if uname -rms | grep Darwin &> /dev/null; then
   java -version
 fi
 
-export jenkins_url JENKINS_HOME JAVA_HOME PATH JENKINS_CLI
+export jenkins_url JENKINS_HOME JAVA_HOME PATH JENKINS_CLI CURL
+
+#
+# SCRIPT CONSOLE SCRIPTS
+#
+
+function script_skip_wizard() {
+  cat <<'EOF'
+import hudson.util.PluginServletFilter
+def j=Jenkins.instance
+if('getSetupWizard' in j.metaClass.methods*.name.sort().unique()) {
+    def w=j.getSetupWizard()
+    if(w != null) {
+        try {
+          w.completeSetup()
+        }
+        catch(Exception e) {
+          //pre Jenkins 2.6
+          w.completeSetup(j)
+          PluginServletFilter.removeFilter(w.FORCE_SETUP_WIZARD_FILTER)
+        }
+        j.save()
+        println 'Wizard skipped.'
+    }
+}
+EOF
+}
+
+function script_disable_usage_stats() {
+  echo 'Jenkins.instance.setNoUsageStatistics(true)'
+}
+
+function script_upgrade_plugins() {
+  cat <<'EOF'
+import hudson.model.UpdateSite
+
+def j = Jenkins.instance
+
+/*
+   Install Jenkins plugins
+ */
+def install(Collection c, Boolean dynamicLoad, UpdateSite updateSite) {
+    c.each {
+        println "Installing ${it} plugin."
+        UpdateSite.Plugin plugin = updateSite.getPlugin(it)
+        Throwable error = plugin.deploy(dynamicLoad).get().getError()
+        if(error != null) {
+            println "ERROR installing ${it}, ${error}"
+        }
+    }
+    null
+}
+
+//upgrade plugins
+UpdateSite s = (UpdateSite) j.getUpdateCenter().getSite(UpdateCenter.ID_DEFAULT)
+
+//download latest JSON update data
+s.updateDirectlyNow(true)
+
+install(s.getUpdates()*.getInstalled()*.getShortName(), false, s)
+EOF
+}
+
+function script_install_plugins() {
+  cat <<EOF
+def plugins = "$@".split('[, ]') as ArrayList
+
+/*
+   Install Jenkins plugins
+ */
+def install(Collection c, Boolean dynamicLoad, UpdateSite updateSite) {
+    c.each {
+        println "Installing \${it} plugin."
+        UpdateSite.Plugin plugin = updateSite.getPlugin(it)
+        Throwable error = plugin.deploy(dynamicLoad).get().getError()
+        if(error != null) {
+            println "ERROR installing \${it}, \${error}"
+        }
+    }
+    null
+}
+
+def j = Jenkins.instance
+
+//upgrade plugins
+UpdateSite s = (UpdateSite) j.getUpdateCenter().getSite(UpdateCenter.ID_DEFAULT)
+//only install plugins if they're missing
+install(plugins - j.pluginManager.getPlugins()*.getShortName(), true, s)
+EOF
+}
 
 #
 # FUNCTIONS
 #
+
+function jenkins_script_console() {
+  echo "Calling jenkins_script_console $1"
+  ${CURL} --data-urlencode "script=$(eval "$@")" ${JENKINS_WEB}/scriptText
+}
+
+#CSRF protection support
+function is_crumbs_enabled() {
+  use_crumbs="$( $CURL -s ${JENKINS_WEB}/api/json?pretty=true 2> /dev/null | python -c 'import sys,json;exec "try:\n  j=json.load(sys.stdin)\n  print str(j[\"useCrumbs\"]).lower()\nexcept:\n  pass"' )"
+  if [ "${use_crumbs}" = "true" ]; then
+    return 0
+  fi
+  return 1
+}
+
+#CSRF protection support
+function get_crumb() {
+  ${CURL} -s ${JENKINS_WEB}/crumbIssuer/api/json | python -c 'import sys,json;j=json.load(sys.stdin);print j["crumbRequestField"] + "=" + j["crumb"]'
+}
+
+#CSRF protection support
+function csrf_set_curl() {
+  if is_crumbs_enabled; then
+    if [ ! "${CSRF_CRUMB}" = "$(get_crumb)" ]; then
+      if [ -n "${CSRF_CRUMB}" ]; then
+        #remove existing crumb value from curl command
+        CURL="$(echo "${CURL}" | sed "s/ -d ${CSRF_CRUMB}//")"
+      fi
+      export CSRF_CRUMB="$(get_crumb)"
+      export CURL="${CURL} -d ${CSRF_CRUMB}"
+      echo "Using crumbs for CSRF support."
+    elif ! echo "${CURL}" | grep -F "${CSRF_CRUMB}" &> /dev/null; then
+      export CURL="${CURL} -d ${CSRF_CRUMB}"
+      echo "Using crumbs for CSRF support."
+    fi
+  fi
+}
+
+function is_auth_enabled() {
+  no_authentication="$( $CURL -s ${JENKINS_WEB}/api/json?pretty=true 2> /dev/null | python -c 'import sys,json;exec "try:\n  j=json.load(sys.stdin)\n  print str(j[\"useSecurity\"]).lower()\nexcept:\n  pass"' )"
+  #check if authentication is required.;
+  #if the value of no_authentication is anything but false; then assume authentication
+  if [ ! "${no_authentication}" = "false" ]; then
+    echo -n "Authentication required..."
+    if [ -e "${JENKINS_HOME}/secrets/initialAdminPassword" ]; then
+      echo "DONE"
+      return 0
+    else
+      echo "FAILED"
+      echo "Could not set authentication."
+      echo "Missing file: ${JENKINS_HOME}/secrets/initialAdminPassword"
+      exit 1
+    fi
+  fi
+  return 1
+}
+
 function url_ready() {
   url="$1"
   echo -n "Waiting for ${url} to become available."
@@ -73,10 +220,16 @@ function url_ready() {
   done
   echo 'ready.'
 }
+
 function download_file() {
   #see bash man page and search for Parameter Expansion
-  url="$1"
-  file="${1##*/}"
+  if [ "$#" = 1 ]; then
+    url="$1"
+    file="${1##*/}"
+  else
+    url="$1"
+    file="$2"
+  fi
   url_ready "${url}"
   if [ ! -e "${file}" ]; then
     curl -SLo "${file}" "${url}"
@@ -136,13 +289,6 @@ function update_jenkins_plugins() {
   fi
 }
 
-function install_jenkins_plugins() {
-  #download the jenkins-cli.jar client
-  download_file "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
-  echo 'Install Jenkins Plugins using jenkins-cli.'
-  ${JENKINS_CLI} install-plugin $@
-}
-
 function jenkins_cli() {
   #download the jenkins-cli.jar client
   download_file "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
@@ -152,7 +298,7 @@ function jenkins_cli() {
 
 function force-stop() {
   if [ -e 'jenkins.pid' ]; then
-    kill -9 $(cat jenkins.pid)
+    kill -9 $(cat jenkins.pid) 2> /dev/null
     rm -f jenkins.pid
   fi
 }
@@ -177,29 +323,40 @@ case "$1" in
           ;;
       esac
     done
+
     #provision Jenkins by default
     #download jenkins.war
-    download_file ${jenkins_url}
+    download_file ${jenkins_url} jenkins.war
 
-    #create a JENKINS_HOME directory
-    mkdir -p "${JENKINS_HOME}"
     echo "JENKINS_HOME=${JENKINS_HOME}"
 
     start_or_restart_jenkins
 
-    #disable automatic submission of usage statistics to Jenkins for privacy
-    download_file "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
-    curl -d 'script=Jenkins.instance.setNoUsageStatistics(true)' ${JENKINS_WEB}/scriptText
+    url_ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
 
-    update_jenkins_plugins
+    #try enabling authentication
+    if is_auth_enabled; then
+      export CURL="${CURL} -u admin:$(<${JENKINS_HOME}/secrets/initialAdminPassword)"
+    fi
 
-    install_jenkins_plugins git github github-oauth
+    #try enabling CSRF protection support
+    csrf_set_curl
+
+    jenkins_script_console script_skip_wizard
+    jenkins_script_console script_disable_usage_stats
+    jenkins_script_console script_upgrade_plugins
+    jenkins_script_console script_install_plugins "credentials-binding,git,github,github-oauth,job-dsl,matrix-auth,matrix-project,pipeline-stage-view,ssh-slaves,workflow-aggregator"
 
     if ! ${skip_restart}; then
       start_or_restart_jenkins
+      url_ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
     fi
 
     echo "Jenkins is ready.  Visit ${JENKINS_WEB}/"
+    if is_auth_enabled &> /dev/null; then
+      echo "User: admin"
+      echo "Password: $(<${JENKINS_HOME}/secrets/initialAdminPassword)"
+    fi
     ;;
   download-file)
     shift
@@ -216,7 +373,13 @@ case "$1" in
     ;;
   install-plugins)
     shift
-    install_jenkins_plugins $@
+    #try enabling authentication
+    if is_auth_enabled; then
+      export CURL="${CURL} -u admin:$(<${JENKINS_HOME}/secrets/initialAdminPassword)"
+    fi
+    #try enabling CSRF protection support
+    csrf_set_curl
+    jenkins_script_console script_install_plugins "$@"
     ;;
   update-plugins)
     update_jenkins_plugins
