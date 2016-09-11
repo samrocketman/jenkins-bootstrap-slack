@@ -1,19 +1,19 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <actions/>
-  <description></description>
+  <description/>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.BooleanParameterDefinition>
           <name>fail</name>
-          <description></description>
+          <description/>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>unstable</name>
-          <description></description>
+          <description/>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
@@ -29,18 +29,20 @@
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-echo &quot;hello world&quot;
-if [ ! -e &quot;jenkins-cli.jar&quot; ]; then
-  echo &quot;Downloading jenkins-cli.jar from localhost.&quot;
-  curl -sLo &apos;jenkins-cli.jar&apos; &apos;http://localhost:8080/jnlpJars/jenkins-cli.jar&apos;
-fi
-if ${unstable}; then
-  java -jar jenkins-cli.jar -s &apos;http://localhost:8080/&apos; set-build-result unstable
-fi
+echo "hello world"
 if ${fail}; then
   exit 1
 fi</command>
     </hudson.tasks.Shell>
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.29">
+      <scriptSource class="hudson.plugins.groovy.StringScriptSource">
+        <command>if(build.buildVariables['unstable'] == 'true') {
+  build.result = hudson.model.Result.fromString('UNSTABLE')
+}</command>
+      </scriptSource>
+      <bindings/>
+      <classpath/>
+    </hudson.plugins.groovy.SystemGroovy>
   </builders>
   <publishers>
     <jenkins.plugins.slack.SlackNotifier plugin="slack@2.0.1">
@@ -48,7 +50,7 @@ fi</command>
       <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
       <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
-      <sendAs></sendAs>
+      <sendAs/>
       <startNotification>false</startNotification>
       <notifySuccess>true</notifySuccess>
       <notifyAborted>false</notifyAborted>
