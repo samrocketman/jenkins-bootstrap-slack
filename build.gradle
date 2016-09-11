@@ -48,7 +48,7 @@ repositories {
 }
 dependencies {
     //get Jenkins
-    getjenkins 'org.jenkins-ci.main:jenkins-war:2.7.1@war'
+    getjenkins 'org.jenkins-ci.main:jenkins-war:2.7.4@war'
 
     //get plugins
     getplugins 'com.coravy.hudson.plugins.github:github:1.19.2@hpi'
@@ -90,6 +90,10 @@ dependencies {
     getplugins 'org.jenkins-ci.plugins:token-macro:1.12.1@hpi'
     getplugins 'org.jenkins-ci.plugins:translation:1.15@hpi'
     getplugins 'org.jenkins-ci.plugins:windows-slaves:1.1@hpi'
+
+    getplugins 'org.jenkins-ci.plugins:display-url-api:0.3@hpi'
+    getplugins 'org.jenkins-ci.plugins:groovy:1.29@hpi'
+
 }
 
 //download and copy specific versions of plugins
