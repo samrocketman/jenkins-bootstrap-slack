@@ -1,8 +1,13 @@
 /*
    Author: Glen Mailer (https://github.com/glenjamin)
+           Sam Gleske (https://github.com/samrocketman)
    Original Script:
      https://github.com/jenkinsci/slack-plugin/issues/23
  */
+
+import net.sf.json.JSONObject
+
+JSONObject formData = ['slack': ['tokenCredentialId': '']] as JSONObject
 
 def slack = Jenkins.instance.getExtensionList(
   jenkins.plugins.slack.SlackNotifier.DescriptorImpl.class
@@ -18,7 +23,7 @@ def params = [
 def req = [
   getParameter: { name -> params[name] }
 ] as org.kohsuke.stapler.StaplerRequest
-slack.configure(req, null)
+slack.configure(req, formData)
 
 slack.save()
 println 'Slack global settings configured.'

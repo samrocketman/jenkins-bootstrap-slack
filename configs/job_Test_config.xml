@@ -34,7 +34,7 @@ if ${fail}; then
   exit 1
 fi</command>
     </hudson.tasks.Shell>
-    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.29">
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.30">
       <scriptSource class="hudson.plugins.groovy.StringScriptSource">
         <command>if(build.buildVariables['unstable'] == 'true') {
   build.result = hudson.model.Result.fromString('UNSTABLE')
@@ -45,10 +45,9 @@ fi</command>
     </hudson.plugins.groovy.SystemGroovy>
   </builders>
   <publishers>
-    <jenkins.plugins.slack.SlackNotifier plugin="slack@2.0.1">
+    <jenkins.plugins.slack.SlackNotifier plugin="slack@2.1">
       <teamDomain>jenkins-slack-plugin</teamDomain>
       <authToken>jfG4cs9hT6QsRON2ocwXx980</authToken>
-      <buildServerUrl>http://localhost:8080/</buildServerUrl>
       <room>#slack-plugin-testing #random</room>
       <sendAs/>
       <startNotification>false</startNotification>
