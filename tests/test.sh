@@ -19,7 +19,7 @@ export JENKINS_START="java -jar jenkins.war --httpPort=${RANDOM_PORT} --httpList
 export JENKINS_WEB="http://127.0.0.1:${RANDOM_PORT}"
 export JENKINS_CLI="java -jar ./jenkins-cli.jar -s http://127.0.0.1:${RANDOM_PORT} -noKeyAuth"
 export JENKINS_HOME="$(mktemp -d ../my_jenkins_homeXXX)"
-./slack_bootstrap.sh
+bash -xe ./slack_bootstrap.sh
 source scripts/common.sh
 auth_set_curl
 csrf_set_curl
