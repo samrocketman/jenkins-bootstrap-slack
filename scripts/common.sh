@@ -184,3 +184,8 @@ function is_auth_enabled() {
   fi
   return 1
 }
+function auth_set_curl() {
+  if is_auth_enabled; then
+    export CURL="curl -u admin:$(<${JENKINS_HOME}/secrets/initialAdminPassword)"
+  fi
+}
