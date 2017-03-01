@@ -4,6 +4,10 @@ The [Jenkins][jenkins] [Slack plugin][slack-plugin] publishes build information
 to [Slack][slack] teams.   This project is meant to bootstrap Jenkins from
 scratch and pre-configure it to use the Slack plugin for testing.
 
+If you're not already a member of `jenkins-slack-plugin.slack.com` then [please
+join][join-slack] before bootstrapping this code so you can see messages posted
+to it.
+
 # Instructions
 
 ### Provision Jenkins with slack configured
@@ -38,17 +42,21 @@ See other options.
 
 ### Delete Jenkins
 
+Clean up everything:
+
+    ./gradlew clean
+
 Clean your `${JENKINS_HOME}` but don't delete `jenkins.war` or
 `jenkins-cli.jar`.
 
     provision_jenkins.sh clean
 
-Completely purge your Jenkins instance by deleting all files and folders created
-by the bootstrap.
+Alternative way to clean up everything.
 
     provision_jenkins.sh purge
 
 [gh-token]: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+[jenkins]: http://jenkins-ci.org/
+[join-slack]: https://jenkins-slack-testing-signup.herokuapp.com/
 [slack-plugin]: https://github.com/jenkinsci/slack-plugin
 [slack]: https://slack.com/
-[jenkins]: http://jenkins-ci.org/
