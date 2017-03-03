@@ -61,7 +61,7 @@ dependencies {
     getplugins 'org.jenkins-ci.plugins:bouncycastle-api:2.16.0@hpi'
     getplugins 'org.jenkins-ci.plugins:cobertura:1.9.8@hpi'
     getplugins 'org.jenkins-ci.plugins:covcomplplot:1.1.1@hpi'
-    getplugins 'org.jenkins-ci.plugins:credentials:2.1.12@hpi'
+    getplugins 'org.jenkins-ci.plugins:credentials:2.1.13@hpi'
     getplugins 'org.jenkins-ci.plugins:cvs:2.13@hpi'
     getplugins 'org.jenkins-ci.plugins:display-url-api:1.1.1@hpi'
     getplugins 'org.jenkins-ci.plugins:external-monitor-job:1.7@hpi'

@@ -55,6 +55,18 @@ Alternative way to clean up everything.
 
     provision_jenkins.sh purge
 
+# Updating this repository
+
+Script console script to generate `sed` expressions to update plugin versions in
+`build.gradle`.
+
+```
+Jenkins.instance.pluginManager.plugins.each { p ->
+  println "s/^( +getplugins[^:]+:${p.shortName}):[^@]+@(.+)/\\1:${p.version}@\\2/"
+}
+null
+```
+
 [gh-token]: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 [jenkins]: http://jenkins-ci.org/
 [join-slack]: https://jenkins-slack-testing-signup.herokuapp.com/
