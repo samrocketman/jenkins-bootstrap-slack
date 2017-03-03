@@ -86,6 +86,7 @@ fi
 #create jobs for testing
 create_job --job-name "Test" --xml-data "${BOOTSTRAP_HOME}/configs/job_Test_config.xml"
 create_job --job-name "jervis" --xml-data "${BOOTSTRAP_HOME}/configs/job_jervis_config.xml"
+create_job --job-name "JervisPipeline" --xml-data "${BOOTSTRAP_HOME}/configs/job_JervisPipeline_config.xml"
 create_job --job-name "slack-plugin" --xml-data "${BOOTSTRAP_HOME}/configs/job_slack-plugin_config.xml"
 jenkins_console --script "${SCRIPT_LIBRARY_PATH}/configure-markup-formatter.groovy"
 jenkins_console --script "${SCRIPT_LIBRARY_PATH}/configure-slack.groovy"
