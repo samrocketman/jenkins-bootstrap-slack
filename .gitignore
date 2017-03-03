@@ -1,4 +1,5 @@
 /.gradle
+/.vagrant
 /console.log
 /jenkins-cli.jar
 /jenkins.pid

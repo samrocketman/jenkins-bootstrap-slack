@@ -1,0 +1,3 @@
+#install in /etc/sysconfig/docker.mattermost
+MATTERMOST_DOCKER_OPTIONS="-p 8065:8065"
+MATTERMOST_DOCKER_IMAGE="mattermost/mattermost-preview"

@@ -1,0 +1,18 @@
+#http://container-solutions.com/running-docker-containers-with-systemd/
+#install in /etc/systemd/system/docker.mattermost.service
+[Unit]
+Description=Mattermost Preview
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+Environment=MATTERMOST_DOCKER_IMAGE=mattermost/mattermost-preview
+EnvironmentFile=-/etc/sysconfig/docker.mattermost
+ExecStartPre=/usr/bin/docker pull $MATTERMOST_DOCKER_IMAGE
+ExecStart=/usr/bin/docker run --rm $MATTERMOST_DOCKER_OPTIONS --name %n $MATTERMOST_DOCKER_IMAGE
+ExecStop=/usr/bin/docker stop %n
+
+[Install]
+WantedBy=multi-user.target
