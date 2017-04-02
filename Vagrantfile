@@ -39,6 +39,7 @@ Vagrant.configure("2") do |config|
       systemctl daemon-reload
       systemctl start docker.mattermost.service
       echo "systemd mattermost preview docker service installed." >&2
+      echo "To see mattermost visit http://localhost:8065/" >&2
     )
   SHELL
 end
