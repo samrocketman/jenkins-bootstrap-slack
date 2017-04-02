@@ -64,7 +64,7 @@ to it.
     See the License for the specific language governing permissions and
     limitations under the License.
 
-For the full license see [LICENSE](LICENSE)
+For the full license see [LICENSE](LICENSE).
 
 [gh-token]: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 [jenkins]: http://jenkins-ci.org/
