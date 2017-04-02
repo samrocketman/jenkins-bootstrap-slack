@@ -54,7 +54,7 @@ Upgrade all of the plugins in the `build.gradle` file.
 After upgrading purge and bootstrap Jenkins again.  Run through the test
 sequence documented in root README.
 
-[1]: https://github.com/samrocketman/home/blob/master/bin/jenkins-call-url
+[1]: https://github.com/samrocketman/home/blob/d88bbc190f6d4abad9157aacd614cae38b2e8254/bin/jenkins-call-url
 [2]: https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Script+Console
 [3]: https://repo.jenkins-ci.org/
 [4]: https://maven.apache.org/pom.html#Maven_Coordinates
