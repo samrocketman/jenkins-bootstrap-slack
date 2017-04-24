@@ -43,15 +43,16 @@ while [ "$(jenkins-call-url scripts/upgrade/isUpgradeInProgress.groovy)" = 'true
 done
 echo
 
+if [ "$(jenkins-call-url scripts/upgrade/needsRestart.groovy)" = 'true' ]; then
+  #restart Jenkins
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" restart
+  #wait for jenkins to become available
+  "${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" url-ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
 
-#restart Jenkins
-"${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" restart
-#wait for jenkins to become available
-"${SCRIPT_LIBRARY_PATH}/provision_jenkins.sh" url-ready "${JENKINS_WEB}/jnlpJars/jenkins-cli.jar"
-
-#set up Jenkins env vars post-restart
-source scripts/upgrade/env.sh
-export JENKINS_CALL_ARGS='-m POST http://localhost:8080/scriptText --data-string script= -d'
+  #set up Jenkins env vars post-restart
+  source scripts/upgrade/env.sh
+  export JENKINS_CALL_ARGS='-m POST http://localhost:8080/scriptText --data-string script= -d'
+fi
 
 #temp file will automatically be cleaned up on exit because of trap function
 TMPFILE=$(mktemp)
@@ -62,12 +63,15 @@ jenkins-call-url scripts/upgrade/generateSedExpr.groovy > "${TMPFILE}"
 sed -i.bak -rf "${TMPFILE}" build.gradle
 rm build.gradle.bak
 
-echo 'Detecting missing plugins:'
+#search for plugins missing from build.gradle
 jenkins-call-url scripts/upgrade/listShortName.groovy > "${TMPFILE}"
 
 MISSING_PLUGINS=false
 while read x; do
   grep -- "$x" build.gradle > /dev/null || {
+    if ! ${MISSING_PLUGINS}; then
+      echo 'Detected missing plugins:'
+    fi
     echo -n "  Missing "
     #use bash Parameter Expansion to delete all : characters from $x
     jenkins-call-url scripts/upgrade/listSearchPom.groovy | grep "${x//:/}"
