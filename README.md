@@ -53,7 +53,10 @@ to it.
 Keeping up with updates can be a challenge if it's not automated.  The following
 process keeps upgrading simple.
 
-    source scripts/upgrade/env.sh
+    ./scripts/upgrade/upgrade_build_gradle.sh
+
+See the more detailed [upgrade process](scripts/upgrade/README.md).
+
 
 # License
 
