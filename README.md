@@ -48,6 +48,13 @@ If you're not already a member of `jenkins-slack-plugin.slack.com` then [please
 join][join-slack] before bootstrapping this code so you can see messages posted
 to it.
 
+# Upgrading this project
+
+Keeping up with updates can be a challenge if it's not automated.  The following
+process keeps upgrading simple.
+
+    source scripts/upgrade/env.sh
+
 # License
 
     Copyright (c) 2015-2017 Sam Gleske - https://github.com/samrocketman/jenkins-bootstrap-slack

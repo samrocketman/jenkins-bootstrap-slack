@@ -23,7 +23,9 @@
 
 import jenkins.model.Jenkins
 
+println "s/(.*getjenkins.*:jenkins-war):[^@]+@(hpi')/\\1:${Jenkins.instance.version}@\\2/"
+
 Jenkins.instance.pluginManager.plugins.each { p ->
-  println "s/(.*getplugins.*:${p.shortName}):[^@]+@(hpi')/\\1:${p.version}@\\2/"
+    println "s/(.*getplugins.*:${p.shortName}):[^@]+@(hpi')/\\1:${p.version}@\\2/"
 }
 null
