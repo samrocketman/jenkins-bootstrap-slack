@@ -22,16 +22,54 @@ The following outlines a more detailed test sequence.
 
 ### Testing slack.com
 
-> Note: Log into https://jenkins-slack-plugin.slack.com/ to watch for output
-> messages.
+1. Bootstrap fresh Jenkins.  `./slack_bootstrap.sh`.
+2. Once Jenkins is up and running, execute the following automation script to
+   run through building jobs.
 
-1. Bootstrap fresh Jenkins.  `./slack_bootstrap.sh`
-2. Execute the following jobs
+   ```
+   ./tests/integration/slack-test.sh
+   ```
+
+3. Once the script finishes running, manually verify all of the output messages
+   at https://jenkins-slack-plugin.slack.com/.
 
 ### Testing mattermost
 
-> Note: Execute `vagrant up` to bring up Mattermost.  Log into
-> http://localhost:8065/ to watch for output messages.
+Configure Mattermost
+
+1. Bootstrap Mattermost with `vagrant up`.  Log into http://localhost:8065/ when
+   it finishes.
+2. Sign up with a dummy account.  This first account will be an admin.
+3. Create a new team named `slack-plugin`.
+4. Enable integrations.  Visit _System Console > Integrations > Custom
+   Integrations_ and be sure to _Enable Incoming Webhooks_.  Switch back to the
+   `slack-plugin` team when finished.
+5. Under `slack-plugin` menu click _Integrations_.  Add an incomming web hook.
+   Give it any name.  When you're finished you'll be presented with an
+   integration URL like
+   `http://localhost:8065/hooks/zsj3k4e3qbyq7qxpoqndruyoqy`.
+
+   * `http://localhost:8065/hooks/` is your base URL.
+   * `zsj3k4e3qbyq7qxpoqndruyoqy` is your integration token.
+
+Configure slack plugin to use Mattermost.
+
+1. Go to Manage Jenkins > Configure System.
+2. Under the _Global Slack Notifier Settings_ you'll need to configure:
+
+   * Base URL: `http://localhost:8065/hooks/`
+   * Team Subdomain: `slack-plugin`
+   * Integration Token: `zsj3k4e3qbyq7qxpoqndruyoqy` (this will be different
+     each time)
+   * Channel: `Off-Topic`
+3. Test the connection to be sure it's good.
+4. Execute the following automation script to run through building jobs.
+
+   ```
+   ./tests/integration/slack-test.sh
+   ```
+5. Once the script finishes running, manually verify all of the output messages
+   at `http://localhost:8065/slack-plugin/channels/off-topic`.
 
 # Usage Instructions
 
