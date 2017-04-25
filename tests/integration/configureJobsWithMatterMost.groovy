@@ -14,13 +14,20 @@
    limitations under the License.
    */
 /*
-   Reports true if any job within Jenkins is building.  Otherwise, returns false.
+   Configures each FreeStyle job with empty settings so that it uses the global
+   mattermost configuration.
  */
-
-import hudson.model.Job
 import jenkins.model.Jenkins
+import hudson.model.FreeStyleProject
+import jenkins.plugins.slack.SlackNotifier
 
-println Jenkins.instance.getAllItems(Job.class).findAll { Job job ->
-    job.isBuilding()
-} as Boolean
+Jenkins.instance.getAllItems(FreeStyleProject.class).each { project ->
+    SlackNotifier slack = project.publishersList.find { it.class.simpleName == 'SlackNotifier' }
+    if(slack) {
+        slack.teamDomain = ''
+        slack.authToken = ''
+        slack.room = ''
+    }
+    project.save()
+}
 null

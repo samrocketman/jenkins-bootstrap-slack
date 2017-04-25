@@ -62,14 +62,24 @@ Configure slack plugin to use Mattermost.
    * Integration Token: `zsj3k4e3qbyq7qxpoqndruyoqy` (this will be different
      each time)
    * Channel: `Off-Topic`
+
 3. Test the connection to be sure it's good.
-4. Execute the following automation script to run through building jobs.
+4. Configure all jobs to use the global mattermost configurations by executing
+   the following script.
+
+   ```
+   ./tests/integration/setup-mattermost.sh
+   ```
+
+5. Execute the following automation script to run through building jobs.
 
    ```
    ./tests/integration/slack-test.sh
    ```
-5. Once the script finishes running, manually verify all of the output messages
-   at `http://localhost:8065/slack-plugin/channels/off-topic`.
+
+6. Once the script finishes running, manually verify all of the output messages
+   at `http://localhost:8065/slack-plugin/channels/off-topic`.  All output
+   messages should be the same as when tested on `slack.com`.
 
 # Usage Instructions
 
