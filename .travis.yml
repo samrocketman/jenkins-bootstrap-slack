@@ -6,4 +6,4 @@ script:
   - timeout 1200 ./tests/test.sh
 branches:
   only:
-    - master
+    - main
